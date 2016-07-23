@@ -19,6 +19,8 @@ class ViewController: UIViewController {
     
     // All vars have to be initialized and swift is inferring the type is Bool
     private var userIsInTheMiddleOfTyping = false
+    // We'll grab a reference to the "." button if used
+    var period : UIButton?
 
     // Every time you create a new class you get 1 free no-arg initializer
     private var brain = CalculatorBrain()
@@ -44,12 +46,14 @@ class ViewController: UIViewController {
          currentTitle - type is Optional and its associated value is a String.
         */
         let digit = sender.currentTitle!
-        // '!' means unwrap this thing and give me the associated value
-//        print("touched \(digit) digit")
 
         if (userIsInTheMiddleOfTyping) {
-            // display! means unwrapped the optional and got the associated UILabel
-            // It was necessary when we declared var display: UILabel?
+            // If they've already typed a ".", we cannot let them do this again in the same number
+            if digit == "." {
+                period = sender
+                period!.enabled = false // '!' means unwrap this thing and give me the associated value
+            }
+
             let textCurrentlyInDisplay = display.text!
             display.text = textCurrentlyInDisplay + digit
         } else {
@@ -62,6 +66,8 @@ class ViewController: UIViewController {
         if userIsInTheMiddleOfTyping {
             brain.setOperand(displayValue)
             userIsInTheMiddleOfTyping = false
+            // An operator will clear the "." availability for the next digit
+            period?.enabled = true
         }
         if let mathematicalSymbol = sender.currentTitle {
             brain.performOperation(mathematicalSymbol)
