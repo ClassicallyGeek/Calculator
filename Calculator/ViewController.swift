@@ -47,13 +47,13 @@ class ViewController: UIViewController {
         */
         let digit = sender.currentTitle!
 
-        if (userIsInTheMiddleOfTyping) {
-            // If they've already typed a ".", we cannot let them do this again in the same number
-            if digit == "." {
-                period = sender
-                period!.enabled = false // '!' means unwrap this thing and give me the associated value
-            }
+        // If they've already typed a ".", we cannot let them do this again in the same number
+        if digit == "." {
+            period = sender
+            period!.enabled = false // '!' means unwrap this thing and give me the associated value
+        }
 
+        if (userIsInTheMiddleOfTyping) {
             let textCurrentlyInDisplay = display.text!
             display.text = textCurrentlyInDisplay + digit
         } else {
