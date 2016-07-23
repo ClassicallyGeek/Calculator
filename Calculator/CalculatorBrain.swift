@@ -34,11 +34,16 @@ class CalculatorBrain {
         "π" : .Constant(M_PI),
         "e" : .Constant(M_E),
         "√" : .UnaryOperation(sqrt),
+        "tan" : .UnaryOperation(tan),
+        "sin" : .UnaryOperation(sin),
         "cos" : .UnaryOperation(cos),
+        "±" : .UnaryOperation( { (x: Double) -> Double in return x * -1 } ),
+        "Exp" : .BinaryOperation( { (x: Double, y: Double) -> Double in return pow(x,y) } ),
         "×" : .BinaryOperation( { (x: Double, y: Double) -> Double in return x*y }),
         "−" : .BinaryOperation( { (x: Double, y: Double) -> Double in return x-y } ),
         "+" : .BinaryOperation( { (x: Double, y: Double) -> Double in return x+y } ),
         "÷" : .BinaryOperation( { (x: Double, y: Double) -> Double in return x/y } ),
+        "%" : .BinaryOperation( { (x: Double, y: Double) -> Double in return x%y } ),
         "=" : .Equals
     ]
     
@@ -71,11 +76,10 @@ class CalculatorBrain {
                 pending = PendingBinaryOperationInfo(binaryFunction: function, firstOperand: accumulator)
             case .Equals :
                 executePendingBinaryOperation()
-
             }
         }
-        
     }
+
 
     private func executePendingBinaryOperation() {
         if pending != nil {
