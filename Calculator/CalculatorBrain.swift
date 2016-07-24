@@ -22,34 +22,44 @@ import Foundation
 class CalculatorBrain {
     // MARK: Properties
     private var accumulator = 0.0
+    private var descriptionAccumulator = "0"
     
     enum Operation {
         case Constant(Double)
-        case UnaryOperation((Double)->Double)
-        case BinaryOperation((Double, Double)->Double)
+        case UnaryOperation((Double)->Double, (String)->String)
+        case BinaryOperation((Double, Double)->Double, (String, String)->String)
         case Equals
     }
     
     var operations: Dictionary<String, Operation> = [
         "π" : .Constant(M_PI),
         "e" : .Constant(M_E),
-        "√" : .UnaryOperation(sqrt),
-        "tan" : .UnaryOperation(tan),
-        "sin" : .UnaryOperation(sin),
-        "cos" : .UnaryOperation(cos),
-        "±" : .UnaryOperation( { (x: Double) -> Double in return x * -1 } ),
-        "Exp" : .BinaryOperation( { (x: Double, y: Double) -> Double in return pow(x,y) } ),
-        "×" : .BinaryOperation( { (x: Double, y: Double) -> Double in return x*y }),
-        "−" : .BinaryOperation( { (x: Double, y: Double) -> Double in return x-y } ),
-        "+" : .BinaryOperation( { (x: Double, y: Double) -> Double in return x+y } ),
-        "÷" : .BinaryOperation( { (x: Double, y: Double) -> Double in return x/y } ),
-        "%" : .BinaryOperation( { (x: Double, y: Double) -> Double in return x%y } ),
+        "√" : .UnaryOperation(sqrt, { (calculations: String) -> String in return "√(" + calculations + ")"}),
+        "tan" : .UnaryOperation(tan, { (calculations: String) -> String in return "tan(" + calculations + ")"} ),
+        "sin" : .UnaryOperation(sin, { (calculations: String) -> String in return "sin(" + calculations + ")"}),
+        "cos" : .UnaryOperation(cos, { (calculations: String) -> String in return "cos(" + calculations + ")"}),
+        "±" : .UnaryOperation( { (x: Double) -> Double in return x * -1 },
+            { (calculations: String) -> String in return "±(" + calculations + ")"} ), // TODO This one might need some more work
+        "Exp" : .BinaryOperation( { (x: Double, y: Double) -> Double in return pow(x,y) },
+            { ( x: String, y: String ) -> String in return x + "^" + y}),
+        "×" : .BinaryOperation( { (x: Double, y: Double) -> Double in return x*y },
+            { ( x: String, y: String ) -> String in return x + " × " + y}),
+        "−" : .BinaryOperation( { (x: Double, y: Double) -> Double in return x-y },
+            { ( x: String, y: String ) -> String in return x + " − " + y}),
+        "+" : .BinaryOperation( { (x: Double, y: Double) -> Double in return x+y },
+            { ( x: String, y: String ) -> String in return x + " + " + y}),
+        "÷" : .BinaryOperation( { (x: Double, y: Double) -> Double in return x/y },
+            { ( x: String, y: String ) -> String in return x + " ÷ " + y}),
+        "%" : .BinaryOperation( { (x: Double, y: Double) -> Double in return x%y },
+            { ( x: String, y: String ) -> String in return x + " % " + y}),
         "=" : .Equals
     ]
     
     struct PendingBinaryOperationInfo {
         var binaryFunction: (Double, Double)->Double
         var firstOperand: Double
+        var descriptionFunction: (String, String)->String
+        var descriptionOperand: String
     }
     
     var pending:PendingBinaryOperationInfo?
@@ -61,29 +71,48 @@ class CalculatorBrain {
         }
     }
     
+    var description: String {
+        get {
+            if pending == nil {
+                return descriptionAccumulator
+            }
+            return pending!.descriptionFunction(pending!.descriptionOperand,
+                                                pending!.descriptionOperand != descriptionAccumulator ? descriptionAccumulator : "")
+        }
+    }
+    
     // MARK: Math Things
     func setOperand(operand: Double) {
         accumulator = operand
+        // setting operand updates the description as well
+        descriptionAccumulator = String(format: "%g", operand)
     }
     
     func performOperation(symbol: String) {
         if let operation = operations[symbol] {
             switch operation {
-            case .Constant(let associatedConstantValue) : accumulator = associatedConstantValue
-            case .UnaryOperation(let associatedFunction) : accumulator = associatedFunction(accumulator)
-            case .BinaryOperation(let function) :
+            case .Constant(let associatedConstantValue) :
+                accumulator = associatedConstantValue
+                descriptionAccumulator = symbol
+            case .UnaryOperation(let associatedFunction, let descriptionFunction) :
+                accumulator = associatedFunction(accumulator)
+                descriptionAccumulator = descriptionFunction(descriptionAccumulator)
+            case .BinaryOperation(let function, let descriptionFunction) :
                 executePendingBinaryOperation()
-                pending = PendingBinaryOperationInfo(binaryFunction: function, firstOperand: accumulator)
+                pending = PendingBinaryOperationInfo(binaryFunction: function, firstOperand: accumulator,
+                                                     descriptionFunction: descriptionFunction, descriptionOperand: descriptionAccumulator)
             case .Equals :
                 executePendingBinaryOperation()
+                print(description)
             }
         }
     }
-
-
+    
+    
     private func executePendingBinaryOperation() {
         if pending != nil {
             accumulator = pending!.binaryFunction(pending!.firstOperand, accumulator)
+            descriptionAccumulator = pending!.descriptionFunction(pending!.descriptionOperand, descriptionAccumulator)
             pending = nil
         }
     }
