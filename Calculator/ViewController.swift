@@ -37,6 +37,10 @@ class ViewController: UIViewController {
     }
     
     private func updateCalculations() {
+        if brain.description.count == 0 {
+            calculations.text = " "
+            return;
+        }
         let answer = brain.description.joinWithSeparator(" ")
         if (brain.isPartialResult) {
             print(answer + "...")
