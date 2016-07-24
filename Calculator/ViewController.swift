@@ -16,6 +16,7 @@ class ViewController: UIViewController {
     // ! and ? both mean Optional when declaring a var
     // ! means after first set it's always set-- implicitly unwrapped optional
     @IBOutlet private weak var display: UILabel!
+    @IBOutlet weak var calculations: UILabel!
     
     // All vars have to be initialized and swift is inferring the type is Bool
     private var userIsInTheMiddleOfTyping = false
@@ -33,6 +34,16 @@ class ViewController: UIViewController {
         set {
             display.text = String(newValue)
         }
+    }
+    
+    private func updateCalculations() {
+        let answer = brain.description.joinWithSeparator(" ")
+        if (brain.isPartialResult) {
+            print(answer + "...")
+        } else {
+            print(answer + "=")
+        }
+        calculations.text = answer
     }
     
     // MARK: Button Actions
@@ -60,6 +71,7 @@ class ViewController: UIViewController {
             display.text = digit
         }
         userIsInTheMiddleOfTyping = true
+        updateCalculations()
     }
 
     @IBAction private func performOperation(sender: UIButton) {
@@ -72,6 +84,7 @@ class ViewController: UIViewController {
         if let mathematicalSymbol = sender.currentTitle {
             brain.performOperation(mathematicalSymbol)
         }
+        updateCalculations()
         displayValue = brain.result
     }
 }

@@ -22,6 +22,8 @@ import Foundation
 class CalculatorBrain {
     // MARK: Properties
     private var accumulator = 0.0
+    var description = [String]()
+    var isPartialResult = true
     
     enum Operation {
         case Constant(Double)
@@ -64,18 +66,37 @@ class CalculatorBrain {
     // MARK: Math Things
     func setOperand(operand: Double) {
         accumulator = operand
+        // If you pressed "=" and you start typing a number we are no longer working on the same calculation-- reset it
+        if !isPartialResult {
+            description = []
+        }
+        description.append(String(operand))
     }
     
     func performOperation(symbol: String) {
         if let operation = operations[symbol] {
             switch operation {
-            case .Constant(let associatedConstantValue) : accumulator = associatedConstantValue
-            case .UnaryOperation(let associatedFunction) : accumulator = associatedFunction(accumulator)
+            case .Constant(let associatedConstantValue) :
+                description.append(String(symbol))
+                accumulator = associatedConstantValue
+            case .UnaryOperation(let associatedFunction) :
+                if isPartialResult {
+                    description.insert(String(symbol) + " (", atIndex: description.count-1)
+                } else {
+                    description.insert(String(symbol) + "(", atIndex: 0)
+                }
+                description.insert(")", atIndex:description.count)
+                accumulator = associatedFunction(accumulator)
             case .BinaryOperation(let function) :
+                // There is  test case that allows for continued binary operation after "="
+                isPartialResult = true
+                
+                description.append(String(symbol))
                 executePendingBinaryOperation()
                 pending = PendingBinaryOperationInfo(binaryFunction: function, firstOperand: accumulator)
             case .Equals :
                 executePendingBinaryOperation()
+                isPartialResult = false
             }
         }
     }
