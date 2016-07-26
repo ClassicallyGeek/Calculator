@@ -3,7 +3,6 @@
 //  Calculator
 //
 //  Created by Ashley on 5/5/16.
-//  Copyright © 2016 Stanford Unversity CS 193P. All rights reserved.
 //
 
 import Foundation
@@ -68,6 +67,12 @@ class CalculatorBrain {
     var result: Double {
         get {
             return accumulator
+        }
+    }
+    
+    var isPartialResult: Bool {
+        get {
+            return pending != nil
         }
     }
     
