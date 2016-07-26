@@ -9,6 +9,16 @@ import XCTest
 
 class CalculatorTests: XCTestCase {
     
+    func testPartialResult() {
+        let brain = CalculatorBrain()
+        brain.setOperand(5)
+        brain.performOperation("×")
+        brain.setOperand(3)
+        XCTAssertEqual(brain.isPartialResult, true)
+        brain.performOperation("=")
+        XCTAssertEqual(brain.isPartialResult, false)
+    }
+    
     func testDescription() {
         // a. touching 7 + shows "7 + ..." with 7 still in the display TODO will need an ... eventually
         let brain = CalculatorBrain()
@@ -102,7 +112,5 @@ class CalculatorTests: XCTestCase {
         brain.performOperation("=")
         XCTAssertEqual(brain.description, "4 + 5 × 3")
         XCTAssertEqual(brain.result, 27.0)
-
-
     }
 }

@@ -3,7 +3,6 @@
 //  Calculator
 //
 //  Created by Ashley on 4/25/16.
-//  Copyright © 2016 Stanford Unversity CS 193P. All rights reserved.
 //
 
 import UIKit // This is a module (not a file)-- a group of classes.
