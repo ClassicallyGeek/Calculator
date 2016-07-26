@@ -87,6 +87,7 @@ class CalculatorBrain {
     }
     
     // MARK: Math Things
+
     func setOperand(operand: Double) {
         accumulator = operand
         // setting operand updates the description as well

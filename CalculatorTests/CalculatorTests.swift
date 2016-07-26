@@ -9,6 +9,13 @@ import XCTest
 
 class CalculatorTests: XCTestCase {
     
+    func testInitialValues() {
+        let brain = CalculatorBrain()
+        XCTAssertEqual(brain.result, 0.0)
+        XCTAssertEqual(brain.isPartialResult, false)
+        XCTAssertEqual(brain.description, "0")
+    }
+    
     func testPartialResult() {
         let brain = CalculatorBrain()
         brain.setOperand(5)

@@ -15,6 +15,7 @@ class ViewController: UIViewController {
     // ! and ? both mean Optional when declaring a var
     // ! means after first set it's always set-- implicitly unwrapped optional
     @IBOutlet private weak var display: UILabel!
+    @IBOutlet weak var calculationsDisplay: UILabel!
     
     // All vars have to be initialized and swift is inferring the type is Bool
     private var userIsInTheMiddleOfTyping = false
@@ -34,7 +35,24 @@ class ViewController: UIViewController {
         }
     }
     
+    private func updateCalculationsDisplay() {
+        calculationsDisplay.text = brain.description +
+            (brain.isPartialResult ? " ... " : " = ")
+        
+    }
+    
     // MARK: Button Actions
+    
+    // Reset the value
+    @IBAction func clear(sender: UIButton) {
+        brain = CalculatorBrain()
+        display.text=" "
+        calculationsDisplay.text=" "
+        userIsInTheMiddleOfTyping = false
+        if let periodButton = period {
+            periodButton.enabled = true
+        }
+    }
     
     // IBAction is an XCode special thing so we can see what in the storyboard is connected to this
     @IBAction private func touchDigit(sender: UIButton) {
@@ -72,6 +90,7 @@ class ViewController: UIViewController {
             brain.performOperation(mathematicalSymbol)
         }
         displayValue = brain.result
+        updateCalculationsDisplay()
     }
 }
 
