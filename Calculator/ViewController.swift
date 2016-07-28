@@ -42,15 +42,32 @@ class ViewController: UIViewController {
     }
     
     // MARK: Button Actions
-    
-    // Reset the value
-    @IBAction func clear(sender: UIButton) {
-        brain = CalculatorBrain()
-        display.text=" "
-        calculationsDisplay.text=" "
-        userIsInTheMiddleOfTyping = false
-        if let periodButton = period {
-            periodButton.enabled = true
+
+    // Command Actions for the Calculator
+    @IBAction func calcCommand(sender: UIButton) {
+        let action = sender.currentTitle!
+        
+        switch action {
+        case "C" :
+            brain = CalculatorBrain()
+            display.text="0"
+            calculationsDisplay.text=" "
+            userIsInTheMiddleOfTyping = false
+            if let periodButton = period {
+                periodButton.enabled = true
+            }
+        case "Bksp" :
+            let textCurrentlyInDisplay = display.text!
+            if !userIsInTheMiddleOfTyping { // If they aren't typing there's nothing to backspace.
+                return
+            }
+            if display.text!.characters.count == 1 { // If it's only 1 character long, they're at 0 now
+                display.text = "0"
+            } else {  // Otherwise, we just take the range of start to end-1
+                display.text = textCurrentlyInDisplay.substringWithRange(Range<String.Index>(textCurrentlyInDisplay.startIndex ..< textCurrentlyInDisplay.endIndex.advancedBy(-1)))
+            }
+        default:
+            break
         }
     }
     
@@ -72,7 +89,12 @@ class ViewController: UIViewController {
 
         if (userIsInTheMiddleOfTyping) {
             let textCurrentlyInDisplay = display.text!
-            display.text = textCurrentlyInDisplay + digit
+            // If there is only 1 character in the display check if it's 0 and replace it
+            if display.text?.characters.count == 1 && displayValue == 0.0 {
+                display.text = digit
+            } else {
+                display.text = textCurrentlyInDisplay + digit
+            }
         } else {
             display.text = digit
         }
