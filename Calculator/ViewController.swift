@@ -26,12 +26,13 @@ class ViewController: UIViewController {
     private var brain = CalculatorBrain()
 
     // Automatically track what is in the display to avoid type conversions everywhere
-    private var displayValue: Double {
+    
+    private var displayValue: Double? {
         get {
-            return Double(display.text!)!
+            return Double(display.text!)
         }
         set {
-            display.text = String(newValue)
+            display.text = String(newValue!)
         }
     }
     
@@ -102,8 +103,13 @@ class ViewController: UIViewController {
     }
 
     @IBAction private func performOperation(sender: UIButton) {
+        if displayValue == nil {
+            return
+        }
         if userIsInTheMiddleOfTyping {
-            brain.setOperand(displayValue)
+            if displayValue != nil {
+                brain.setOperand(displayValue!)
+            }
             userIsInTheMiddleOfTyping = false
             // An operator will clear the "." availability for the next digit
             period?.enabled = true
